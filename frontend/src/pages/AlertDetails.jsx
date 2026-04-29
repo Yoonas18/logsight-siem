@@ -6,6 +6,7 @@ import EmptyState from "../components/EmptyState.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import SeverityBadge from "../components/SeverityBadge.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import { api } from "../services/api.js";
 import { formatTimestamp, titleize } from "../utils/format.js";
 
@@ -26,6 +27,7 @@ const investigationQuestions = [
 
 export default function AlertDetails() {
   const { alertId } = useParams();
+  const { canIngest, user } = useAuth();
   const [details, setDetails] = useState(null);
   const [status, setStatus] = useState("new");
   const [loading, setLoading] = useState(true);
@@ -135,8 +137,18 @@ export default function AlertDetails() {
 
           <div className="mt-6 rounded-lg border border-slate-200 p-5">
             <h3 className="text-base font-semibold text-slate-950">Status update</h3>
+            {!canIngest ? (
+              <p className="mt-2 text-sm text-slate-500">
+                Signed in as {user?.role_label}. Status updates are limited to admin and analyst users.
+              </p>
+            ) : null}
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <select className="input" value={status} onChange={(event) => setStatus(event.target.value)}>
+              <select
+                className="input"
+                value={status}
+                onChange={(event) => setStatus(event.target.value)}
+                disabled={!canIngest}
+              >
                 {statuses.map((item) => (
                   <option key={item} value={item}>
                     {titleize(item)}
@@ -146,7 +158,7 @@ export default function AlertDetails() {
               <button
                 type="button"
                 onClick={saveStatus}
-                disabled={saving}
+                disabled={saving || !canIngest}
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-ink-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-ink-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Save className="h-4 w-4" aria-hidden="true" />

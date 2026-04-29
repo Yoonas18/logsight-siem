@@ -43,7 +43,10 @@ def init_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename TEXT NOT NULL,
                 uploaded_at TEXT NOT NULL,
-                total_events INTEGER NOT NULL
+                total_events INTEGER NOT NULL,
+                source TEXT NOT NULL DEFAULT 'file',
+                uploaded_by TEXT,
+                mapping_json TEXT
             );
 
             CREATE TABLE IF NOT EXISTS events (
@@ -83,13 +86,40 @@ def init_db() -> None:
                 FOREIGN KEY (upload_id) REFERENCES uploads(id)
             );
 
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                display_name TEXT NOT NULL,
+                role TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                token_hash TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_events_upload_id ON events(upload_id);
             CREATE INDEX IF NOT EXISTS idx_alerts_upload_id ON alerts(upload_id);
             CREATE INDEX IF NOT EXISTS idx_alerts_rule_id ON alerts(rule_id);
             CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status);
             CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);
+            CREATE INDEX IF NOT EXISTS idx_sessions_token_hash ON sessions(token_hash);
             """
         )
+        _ensure_column(conn, "uploads", "source", "TEXT NOT NULL DEFAULT 'file'")
+        _ensure_column(conn, "uploads", "uploaded_by", "TEXT")
+        _ensure_column(conn, "uploads", "mapping_json", "TEXT")
+
+
+def _ensure_column(conn: sqlite3.Connection, table: str, column: str, definition: str) -> None:
+    existing = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+    if column not in existing:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
 
 def row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:

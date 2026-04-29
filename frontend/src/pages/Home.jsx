@@ -5,11 +5,11 @@ import PageHeader from "../components/PageHeader.jsx";
 
 const pipeline = [
   { label: "Raw Logs", icon: FileUp, text: "CSV rows from systems, users, and applications." },
-  { label: "Parse", icon: FileCode2, text: "Columns become structured event fields." },
-  { label: "Normalize", icon: Sparkles, text: "Actions, roles, and status values are cleaned." },
+  { label: "Parse", icon: FileCode2, text: "Columns are read from native or mapped CSVs." },
+  { label: "Normalize", icon: Sparkles, text: "Mapped values become structured SIEM fields." },
   { label: "Detect", icon: ShieldCheck, text: "Rules match risky patterns in the dataset." },
   { label: "Alert", icon: Bell, text: "Matches become triage-ready alerts." },
-  { label: "Investigate", icon: Search, text: "Students review evidence and update status." },
+  { label: "Investigate", icon: Search, text: "Roles control who can view or update status." },
 ];
 
 export default function Home() {
@@ -40,12 +40,12 @@ export default function Home() {
               See how a SIEM thinks, one event at a time.
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-              LogSight stores uploaded events, runs transparent detection logic, and keeps every
-              generated alert tied to the original log row. The app is intentionally small enough
-              for students to read, modify, and extend.
+              LogSight stores uploaded events, supports mapped CSV imports, runs transparent
+              detection logic, and keeps every generated alert tied to the original log row. The
+              app is intentionally small enough for students to read, modify, and extend.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              {["SQLite storage", "FastAPI detections", "React investigation UI"].map((item) => (
+              {["Role-based access", "CSV schema mapper", "React investigation UI"].map((item) => (
                 <div key={item} className="rounded-lg border border-white/10 bg-white/[0.06] px-4 py-3">
                   <p className="text-sm font-semibold text-cyan-100">{item}</p>
                 </div>
@@ -77,9 +77,9 @@ export default function Home() {
 
       <section className="mt-6 grid gap-4 md:grid-cols-3">
         <div className="panel p-5">
-          <h3 className="text-base font-semibold text-slate-950">Upload learner data</h3>
+          <h3 className="text-base font-semibold text-slate-950">Import learner data</h3>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Use the sample CSV or build your own logs with the required columns.
+            Use the sample CSV, upload mapped open-source CSVs, or import a public CSV URL.
           </p>
         </div>
         <div className="panel p-5">
@@ -89,9 +89,9 @@ export default function Home() {
           </p>
         </div>
         <div className="panel p-5">
-          <h3 className="text-base font-semibold text-slate-950">Practice triage</h3>
+          <h3 className="text-base font-semibold text-slate-950">Practice controlled triage</h3>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Review evidence, map MITRE context, answer investigation questions, and close alerts.
+            Admin and analyst users update cases while student users review evidence safely.
           </p>
         </div>
       </section>

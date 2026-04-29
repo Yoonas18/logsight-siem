@@ -6,9 +6,12 @@ import {
   FileUp,
   Home,
   LayoutDashboard,
+  LogOut,
   ShieldCheck,
+  UserCircle,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
@@ -19,6 +22,14 @@ const navItems = [
 ];
 
 export default function Layout({ children }) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-72 bg-ink-950 text-slate-100 lg:block">
@@ -56,14 +67,31 @@ export default function Layout({ children }) {
             ))}
           </nav>
 
-          <div className="border-t border-white/10 p-5">
+          <div className="space-y-3 border-t border-white/10 p-5">
+            <div className="rounded-lg bg-white/[0.06] p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <UserCircle className="h-4 w-4 text-signal-green" aria-hidden="true" />
+                {user?.display_name}
+              </div>
+              <p className="mt-1 text-xs uppercase tracking-[0.16em] text-cyan-200/70">
+                {user?.role_label}
+              </p>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Sign out
+              </button>
+            </div>
             <div className="rounded-lg bg-white/[0.06] p-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-white">
                 <Activity className="h-4 w-4 text-signal-green" aria-hidden="true" />
                 Learning pipeline
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-300">
-                Upload logs, run detections, and follow each alert back to the original event.
+                Upload logs, map schemas, run detections, and follow each alert back to the original event.
               </p>
             </div>
           </div>
@@ -72,9 +100,20 @@ export default function Layout({ children }) {
 
       <div className="lg:pl-72">
         <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-8 lg:hidden">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
             <ShieldCheck className="h-6 w-6 text-cyan-600" aria-hidden="true" />
             <span className="font-semibold">LogSight SIEM</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-slate-100 text-slate-700"
+              title="Sign out"
+              aria-label="Sign out"
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+            </button>
           </div>
           <nav className="mt-3 flex gap-2 overflow-x-auto pb-1">
             {navItems.map((item) => (
